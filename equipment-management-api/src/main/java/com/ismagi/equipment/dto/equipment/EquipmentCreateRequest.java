@@ -15,6 +15,7 @@ public record EquipmentCreateRequest(
         @NotNull @PastOrPresent LocalDate acquisitionDate,
         @Size(max = 1500) String technicalDescription,
         @Size(max = 120) String serialNumber,
-        @NotNull Long locationId
+        @NotNull Long locationId,
+        @NotNull Long categoryId
 ) {
 }

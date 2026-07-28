@@ -8,6 +8,7 @@ import Dashboard from "./pages/Shared/Dashboard";
 import EquipmentsPage from "./pages/Equipment/EquipmentsPage";
 import EquipmentCreatePage from "./pages/Equipment/EquipmentCreatePage";
 import RoomsPage from "./pages/Rooms/RoomsPage";
+import InterventionsPage from "./pages/Interventions/InterventionsPage";
 
 export default function AppRouter({ mode, onToggleMode }) {
   return (
@@ -25,6 +26,7 @@ export default function AppRouter({ mode, onToggleMode }) {
         <Route path="equipements/nouveau" element={<EquipmentCreatePage />} />
         <Route path="equipements/:id/modifier" element={<EquipmentCreatePage />} />
         <Route path="dashboard/salles" element={<RoomsPage />} />
+        <Route path="dashboard/interventions" element={<InterventionsPage />} />
         <Route path="dashboard/utilisateurs" element={<UsersPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>

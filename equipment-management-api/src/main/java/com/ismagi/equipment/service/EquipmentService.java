@@ -1,17 +1,19 @@
 package com.ismagi.equipment.service;
 
+import com.ismagi.equipment.domain.Category;
 import com.ismagi.equipment.domain.Equipment;
 import com.ismagi.equipment.domain.Location;
 import com.ismagi.equipment.dto.equipment.EquipmentCreateRequest;
 import com.ismagi.equipment.dto.equipment.EquipmentResponse;
 import com.ismagi.equipment.dto.equipment.EquipmentUpdateRequest;
+import com.ismagi.equipment.repository.CategoryRepository;
 import com.ismagi.equipment.repository.EquipmentRepository;
 import com.ismagi.equipment.repository.LocationRepository;
 import java.util.List;
-import org.springframework.util.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,15 +22,18 @@ public class EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
     private final LocationRepository locationRepository;
+    private final CategoryRepository categoryRepository;
     private final FileStorageService fileStorageService;
 
     public EquipmentService(
             EquipmentRepository equipmentRepository,
             LocationRepository locationRepository,
+            CategoryRepository categoryRepository,
             FileStorageService fileStorageService
     ) {
         this.equipmentRepository = equipmentRepository;
         this.locationRepository = locationRepository;
+        this.categoryRepository = categoryRepository;
         this.fileStorageService = fileStorageService;
     }
 
@@ -39,6 +44,7 @@ public class EquipmentService {
         }
 
         Location location = findLocationOrThrow(request.locationId());
+    Category category = findCategoryOrThrow(request.categoryId());
         String photoPath = fileStorageService.storeEquipmentImage(photo);
 
         Equipment equipment = Equipment.builder()
@@ -51,6 +57,7 @@ public class EquipmentService {
                 .technicalDescription(request.technicalDescription())
                 .serialNumber(request.serialNumber())
                 .location(location)
+                .category(category)
                 .build();
 
         return toResponse(equipmentRepository.save(equipment));
@@ -78,6 +85,7 @@ public class EquipmentService {
                 });
 
         Location location = findLocationOrThrow(request.locationId());
+        Category category = findCategoryOrThrow(request.categoryId());
         if (photo != null && !photo.isEmpty()) {
             equipment.setPhotoUrl(fileStorageService.storeEquipmentImage(photo));
         }
@@ -90,6 +98,7 @@ public class EquipmentService {
         equipment.setTechnicalDescription(request.technicalDescription());
         equipment.setSerialNumber(request.serialNumber());
         equipment.setLocation(location);
+        equipment.setCategory(category);
 
         Equipment savedEquipment = equipmentRepository.save(equipment);
         if (photo != null && !photo.isEmpty() && StringUtils.hasText(previousPhotoPath)) {
@@ -117,6 +126,11 @@ public class EquipmentService {
     private Location findLocationOrThrow(Long locationId) {
         return locationRepository.findById(locationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Location not found"));
+    }
+
+    private Category findCategoryOrThrow(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
     }
 
     public EquipmentResponse toResponse(Equipment equipment) {
