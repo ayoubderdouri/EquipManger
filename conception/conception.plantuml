@@ -1,0 +1,130 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+'=========================
+' ENUMS
+'=========================
+
+enum Role {
+    ADMINISTRATEUR
+    RESPONSABLE_TECHNIQUE
+    TECHNICIEN
+    UTILISATEUR
+}
+
+enum EtatEquipement {
+    Fonctionnel
+    EnPanne
+    EnMaintenance
+    HorsService
+}
+
+enum StatutIntervention {
+    Ouverte
+    Affectee
+    EnCours
+    Resolue
+    Annulee
+}
+
+enum NiveauUrgence {
+    Faible
+    Moyen
+    Eleve
+    Critique
+}
+
+'=========================
+' CLASSES
+'=========================
+
+class Utilisateur{
+    +Id : int
+    +Nom : string
+    +Prenom : string
+    +Email : string
+    +PasswordHash : string
+    +Telephone : string
+    +Role : Role
+}
+
+class Salle{
+    +Id : int
+    +Nom : string
+    +Type : string
+    +Localisation : string
+}
+
+class CategorieEquipement{
+    +Id : int
+    +Nom : string
+    +Description : string
+}
+
+class Equipement{
+    +Id : int
+    +Nom : string
+    +Reference : string
+    +NumeroSerie : string
+    +DateAcquisition : Date
+    +Etat : EtatEquipement
+    +Description : string
+    +Photo : string
+}
+
+class Intervention{
+    +Id : int
+    +Titre : string
+    +DescriptionPanne : string
+    +DateDeclaration : DateTime
+    +DateDebut : DateTime
+    +DateFin : DateTime
+    +Urgence : NiveauUrgence
+    +Statut : StatutIntervention
+}
+
+class HistoriqueIntervention{
+    +Id : int
+    +AncienStatut : StatutIntervention
+    +NouveauStatut : StatutIntervention
+    +DateModification : DateTime
+}
+
+class CommentaireIntervention{
+    +Id : int
+    +Message : string
+    +DateCommentaire : DateTime
+}
+
+class PieceJointe{
+    +Id : int
+    +NomFichier : string
+    +Chemin : string
+    +TypeMime : string
+}
+
+'=========================
+' RELATIONS
+'=========================
+
+Salle "1" -- "0..*" Equipement
+
+CategorieEquipement "1" -- "0..*" Equipement
+
+Equipement "1" -- "0..*" Intervention
+
+Utilisateur "1" -- "0..*" Intervention : Déclare >
+
+Utilisateur "0..1" -- "0..*" Intervention : Affectée à >
+
+Intervention "1" -- "0..*" HistoriqueIntervention
+
+Intervention "1" -- "0..*" CommentaireIntervention
+
+Intervention "1" -- "0..*" PieceJointe
+
+Utilisateur "1" -- "0..*" CommentaireIntervention
+
+Utilisateur "1" -- "0..*" HistoriqueIntervention
+
+@enduml

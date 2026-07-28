@@ -1,0 +1,12 @@
+﻿{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Full stack: Spring + React",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "powershell -ExecutionPolicy Bypass -File \"${workspaceFolder}/scripts/launch-fullstack.ps1\"",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

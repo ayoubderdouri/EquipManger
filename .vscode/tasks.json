@@ -1,0 +1,55 @@
+﻿{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Full stack: Spring + React",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/launch-fullstack.ps1"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Spring Boot API",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["spring-boot:run"],
+      "options": {
+        "cwd": "${workspaceFolder}/equipment-management-api"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "backend"
+      }
+    },
+    {
+      "label": "React UI",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev", "--", "--host", "127.0.0.1"],
+      "options": {
+        "cwd": "${workspaceFolder}/equipement-management-ui"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "frontend"
+      }
+    }
+  ]
+}

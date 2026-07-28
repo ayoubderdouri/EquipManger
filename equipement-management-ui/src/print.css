@@ -1,0 +1,38 @@
+﻿/* =========================
+   GLOBAL PRINT SETTINGS
+========================= */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    direction: ltr;
+    font-family: "Times New Roman", serif;
+    background: #fff;
+  }
+  /* body {
+    border: 1px solid black;
+  } */
+
+  /* Ø¥Ø²Ø§Ù„Ø© Ø£ÙŠ shadow Ø£Ùˆ UI */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* IMPORTANT: Ø·Ø¨Ø§Ø¹Ø© Ø§Ù„Ø£Ù„ÙˆØ§Ù† */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* hide buttons */
+  button,
+  .no-print {
+    display: none !important;
+  }
+}
