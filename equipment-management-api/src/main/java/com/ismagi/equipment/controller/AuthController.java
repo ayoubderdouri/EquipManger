@@ -3,10 +3,13 @@ package com.ismagi.equipment.controller;
 import com.ismagi.equipment.domain.User;
 import com.ismagi.equipment.dto.auth.AuthResponse;
 import com.ismagi.equipment.dto.auth.LoginRequest;
+import com.ismagi.equipment.dto.auth.RefreshTokenRequest;
 import com.ismagi.equipment.dto.auth.RegisterRequest;
+import io.jsonwebtoken.JwtException;
 import com.ismagi.equipment.service.JwtService;
 import com.ismagi.equipment.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -34,7 +38,7 @@ public class AuthController {
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         User createdUser = userService.createUser(request);
         UserDetails userDetails = userService.loadUserByUsername(createdUser.getUsername());
-        String token = jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(userDetails, createdUser.getRole().name());
         return new AuthResponse(token, userService.toResponse(createdUser));
     }
 
@@ -45,9 +49,43 @@ public class AuthController {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(userDetails);
         User user = userService.getByUsername(userDetails.getUsername());
+        String token = jwtService.generateToken(userDetails, user.getRole().name());
 
         return new AuthResponse(token, userService.toResponse(user));
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        String token = normalizeToken(request.token());
+
+        String username;
+        try {
+            username = jwtService.extractUsernameAllowExpired(token);
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token", ex);
+        }
+
+        User user;
+        UserDetails userDetails;
+        try {
+            user = userService.getByUsername(username);
+            userDetails = userService.loadUserByUsername(username);
+        } catch (ResponseStatusException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token", ex);
+        }
+
+        String refreshedToken = jwtService.generateToken(userDetails, user.getRole().name());
+        return new AuthResponse(refreshedToken, userService.toResponse(user));
+    }
+
+    private String normalizeToken(String token) {
+        if (token == null) {
+            return null;
+        }
+        if (token.startsWith("Bearer ")) {
+            return token.substring(7);
+        }
+        return token;
     }
 }
